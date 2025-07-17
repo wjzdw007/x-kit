@@ -11,6 +11,7 @@ export const printTweet = (tweet: TweetApiUtilsData) => {
       " "
     )
   );
+  console.log(tweet.tweet.legacy?.fullText);
   tweet.replies.forEach((reply) => {
     reply.tweet.legacy &&
       printLegacyTweet(reply.user.legacy, reply.tweet.legacy);
@@ -26,8 +27,7 @@ export const printLegacyTweet = (user: i.UserLegacy, tweet: i.TweetLegacy) => {
 };
 
 const resp = await client.getTweetApi().getUserTweets({
-  userId: "16044147"
+  userId: "44196397"
 });
-
 resp.data.data.filter((e) => !e.promotedMetadata).forEach((e) => printTweet(e));
 

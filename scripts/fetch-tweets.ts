@@ -1,6 +1,8 @@
 import { XAuthClient } from "./utils";
 import { get } from "lodash";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 import fs from "fs-extra";
 import type { TweetApiUtilsData } from "twitter-openapi-typescript";
 
@@ -16,19 +18,28 @@ const originalTweets = resp.data.data.filter((tweet) => {
 });
 
 const rows: TweetApiUtilsData[] = [];
+const today = dayjs().utc().format("YYYY-MM-DD");
+// const today = "2025-07-16";
 // 输出所有原创推文的访问地址
 originalTweets.forEach((tweet) => {
-  const isQuoteStatus = get(tweet, "raw.result.legacy.isQuoteStatus");
-  if (isQuoteStatus) {
-    return;
-  }
+  // const isQuoteStatus = get(tweet, "raw.result.legacy.isQuoteStatus");
+  // if (isQuoteStatus) {
+  //   return;
+  // }
   const fullText = get(tweet, "raw.result.legacy.fullText", "RT @");
-  if (fullText?.includes("RT @")) {
-    return;
-  }
+  // if (fullText?.includes("RT @")) {
+  //   return;
+  // }
   const createdAt = get(tweet, "raw.result.legacy.createdAt");
-  // return if more than 1 days
-  if (dayjs().diff(dayjs(createdAt), "day") > 1) {
+  const tweetDay = dayjs.utc(createdAt).format("YYYY-MM-DD");
+  
+  if (tweetDay !== today) {
+    console.log("ignort ", tweetDay, today, fullText);
+    return; // 不是今天的推文，跳过
+  }
+  const idStr = get(tweet, "raw.result.legacy.idStr");
+  if (!idStr) {
+    // console.log(tweet);
     return;
   }
   const screenName = get(tweet, "user.legacy.screenName");
@@ -74,10 +85,11 @@ originalTweets.forEach((tweet) => {
     videos,
     tweetUrl,
     fullText,
+    createdAt,
   });
 });
 
-const outputPath = `./tweets/${dayjs().format("YYYY-MM-DD")}.json`;
+const outputPath = `./tweets/${today}.json`;
 let existingRows: TweetApiUtilsData[] = [];
 
 // 如果文件存在，读取现有内容

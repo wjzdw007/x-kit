@@ -30,32 +30,24 @@ bun install
 ```bash
 AUTH_TOKEN=你的X认证Token
 GET_ID_X_TOKEN=用于获取用户ID的Token
+OPENAI_API_KEY=大模型key
+WECHAT_WEBHOOK_URL=机器人推送链接
+WECHAT_BOT_KEY=机器人key
 ```
 
-### 2. 添加需要追踪的用户
 
-在 `dev-accounts.json` 中添加用户信息:
-
-```json
-{
-  "username": "用户名",
-  "twitter_url": "用户主页链接", 
-  "description": "用户描述",
-  "tags": ["标签1", "标签2"]
-}
-```
 
 ### 3. 运行脚本
 
 ```bash
-# 获取用户信息
-bun run scripts/index.ts
+# 总结马斯克今日行为
+bun run scripts/summarize-elon-daily.ts
 
-# 获取最新推文
-bun run scripts/fetch-tweets.ts
+# 监控马斯克每日总结
+bun run scripts/monitor_elon_summary.py
 
-# 批量关注用户
-bun run scripts/batch-follow.ts
+# 发送机器人通知
+python3 scripts/monitor_elon_summary.py
 ```
 
 ## 自动化部署
